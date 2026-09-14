@@ -1,6 +1,6 @@
 # ChatPet
 
-A standalone Swift macOS menu-bar companion, currently named **DesktopPet** in the app. **Blue Turtle—the pet already created for Frank—is the first and default pet.** Its 36 bundled PNG frames are copied unchanged from the corrected September 13, 2026 pet pack, including the visor transparency repair. Original variable frame timing is preserved. Nothing is installed into or modified inside ChatGPT.
+A standalone Swift macOS menu-bar companion, currently named **DesktopPet** in the app. **Blue Turtle is the first and default pet.** Modeled after ChatGPT's pet feature.
 
 ## Build and run
 
