@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "id": "builtin.blue-turtle",
+  "name": "Blue Turtle",
+  "species": "robot",
+  "bodyColor": "#4DA9EB",
+  "accentColor": "#55EDF5",
+  "clips": {
+    "idle": {
+      "frames": [
+        "frames/idle/00.png",
+        "frames/idle/01.png",
+        "frames/idle/02.png",
+        "frames/idle/03.png",
+        "frames/idle/04.png",
+        "frames/idle/05.png"
+      ],
+      "framesPerSecond": 8,
+      "frameDurations": [
+        1.68,
+        0.66,
+        0.66,
+        0.84,
+        0.84,
+        1.92
+      ]
+    },
+    "runLeft": {
+      "frames": [
+        "frames/running-left/00.png",
+        "frames/running-left/01.png",
+        "frames/running-left/02.png",
+        "frames/running-left/03.png",
+        "frames/running-left/04.png",
+        "frames/running-left/05.png",
+        "frames/running-left/06.png",
+        "frames/running-left/07.png"
+      ],
+      "framesPerSecond": 8,
+      "frameDurations": [
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.22
+      ]
+    },
+    "runRight": {
+      "frames": [
+        "frames/running-right/00.png",
+        "frames/running-right/01.png",
+        "frames/running-right/02.png",
+        "frames/running-right/03.png",
+        "frames/running-right/04.png",
+        "frames/running-right/05.png",
+        "frames/running-right/06.png",
+        "frames/running-right/07.png"
+      ],
+      "framesPerSecond": 8,
+      "frameDurations": [
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.22
+      ]
+    },
+    "failed": {
+      "frames": [
+        "frames/failed/00.png",
+        "frames/failed/01.png",
+        "frames/failed/02.png",
+        "frames/failed/03.png",
+        "frames/failed/04.png",
+        "frames/failed/05.png",
+        "frames/failed/06.png",
+        "frames/failed/07.png"
+      ],
+      "framesPerSecond": 8,
+      "frameDurations": [
+        0.14,
+        0.14,
+        0.14,
+        0.14,
+        0.14,
+        0.14,
+        0.14,
+        0.24
+      ]
+    },
+    "laptop": {
+      "frames": [
+        "frames/running/00.png",
+        "frames/running/01.png",
+        "frames/running/02.png",
+        "frames/running/03.png",
+        "frames/running/04.png",
+        "frames/running/05.png"
+      ],
+      "framesPerSecond": 8,
+      "frameDurations": [
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.12,
+        0.22
+      ]
+    }
+  }
+}

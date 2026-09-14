@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "example.lavender",
+  "name": "Lavender",
+  "species": "cat",
+  "bodyColor": "#BEACE3",
+  "accentColor": "#F8DBEA",
+  "clips": {}
+}
