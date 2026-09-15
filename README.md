@@ -58,6 +58,21 @@ Automatic mode sums active `en*` Wi-Fi/Ethernet interfaces and excludes loopback
 
 Rate estimation tracks each interface separately, uses monotonic elapsed time, skips a counter reset, and establishes a baseline for newly seen interfaces. A gap longer than 15 seconds establishes a new baseline. No active matching interface or a read error gives a visible status and idle state; it is not misrepresented as a failed download. A disappeared explicitly selected interface remains selected and resumes when it returns.
 
+## Optional Codex task activity
+
+Enable **Codex task activity** in the paw menu, or open **Settings → Task activity → React to local Codex tasks**. It defaults to off, including when upgrading existing settings. The default source is `~/.codex/sessions`; choose another sessions folder if you use a custom Codex home directory.
+
+| Task event | Default animation |
+| --- | --- |
+| Working | Viewing laptop |
+| Waiting for a recorded blocking input request | Waiting |
+| Finished | Celebration |
+| Failed or interrupted | Failed / tired |
+
+Configure each mapping, completion/failure duration, and stale-task timeout in the Task activity tab. Task events take priority over network activity while present; network activity resumes afterward. Historical completions are not replayed when the trigger is enabled. Pausing or hiding the pet stops the reader, and disabling the trigger releases its priority immediately.
+
+This is a read-only local session adapter with no hooks, account connection, or outgoing requests. It decodes timestamps, event kinds, turn IDs, and tool-call names/IDs. It does not display, save, or transmit conversation content. It supports local Codex tasks, not browser chats or cloud-only tasks. Approval dialogs and unread-review flags that exist only inside ChatGPT are not exposed by this adapter; waiting requires a recorded synchronous input request. See [the investigation and adapter limits](docs/task-activity-investigation.md).
+
 ## Structure and extension points
 
 ```text
@@ -66,13 +81,13 @@ Sources/
   DesktopPet/
     DesktopPetApp.swift     # SwiftUI menu bar and accessory app lifecycle
     AppModel.swift          # Main-actor composition, settings, event orchestration
-    EventSources.swift      # Cancellable network and occasional sources
+    EventSources.swift      # Cancellable network, occasional, and Codex sources
     PetWindowController.swift # Transparent, nonactivating AppKit panel and movement
     PetView.swift           # Timed image rendering and procedural fallback
     SettingsView.swift      # Pet, event mapping, and network settings
     ConfigurationStore.swift # Atomic JSON persistence and corrupt-file backup
     PetLibrary.swift        # Bundled/custom pack loading and import validation
-    Assets/BlueTurtle/      # Original PNGs, manifest, and provenance hashes
+    Assets/BlueTurtle/      # 48 original PNGs, manifest, and provenance hashes
 Tests/
   PetCoreTests/             # Detector, timing, routing, configuration, native reader
   DesktopPetTests/          # Persistence, bundled assets, imports, path containment
@@ -109,7 +124,7 @@ Import `Examples/Lavender` from the menu to try a palette-only pack. For a sprit
 }
 ```
 
-`species` is `cat`, `fox`, or `robot` and controls the fallback. Supported clip keys are `idle`, `runLeft`, `runRight`, `failed`, and `laptop`. `frameDurations` is optional; when present, it gives each frame's duration in seconds, overriding FPS. All clips loop for as long as their animation is selected; event lifetime belongs to the router. The original Blue Turtle `running` row is the laptop clip. Its separate left/right rows are not mirrored approximations.
+`species` is `cat`, `fox`, or `robot` and controls the fallback. Supported clip keys are `idle`, `runLeft`, `runRight`, `failed`, `laptop`, `waiting`, and `celebration`. `frameDurations` is optional; when present, it gives each frame's duration in seconds, overriding FPS. All clips loop for as long as their animation is selected; event lifetime belongs to the router. The original Blue Turtle `running` row is the laptop clip and its `review` row is the celebration clip. Its separate left/right rows are not mirrored approximations. Older packs without the new clips use their procedural fallback.
 
 IDs must be unique and use letters, numbers, periods, hyphens, or underscores. `builtin.*` is reserved. Limits: 120 frames per clip, 1–30 FPS, per-frame durations 0.03–10 seconds, PNG dimensions up to 2048 × 2048, 64 MB of referenced files, and 128 MB of decoded frame data per pack. Frames must resolve inside the folder, including through symlinks. Imports validate and copy only the manifest and referenced frames; duplicate IDs are rejected instead of overwritten. Reload packs after manually editing an installed pack. Bundled assets carry provenance hashes in `Assets/BlueTurtle/provenance.json`.
 
@@ -120,11 +135,11 @@ Custom pets: `~/Library/Application Support/DesktopPet/Pets/<id>/`.
 
 Settings are normalized and atomically saved after changes; the schema version is currently 1. Invalid/unsupported settings are preserved as `settings-unreadable-<UUID>.json` before defaults may replace them. If that backup fails, saving is disabled and a notice explains why. To reset manually, quit the app and move `settings.json` aside. Preserve the `Pets` folder to keep custom packs.
 
-When adding configuration fields, update decoding/migrations explicitly and bump the schema version for incompatible changes. Version 1 uses a complete stored configuration rather than merging partial manually written files. Unknown mapping keys are retained; absent mappings use defaults. Files produced by a newer unsupported version are backed up rather than silently interpreted.
+When adding configuration fields, update decoding/migrations explicitly and bump the schema version for incompatible changes. The optional `codex` settings object is added to version 1 with disabled defaults when absent. Other version 1 fields remain required rather than merging arbitrary partial manually written files. Unknown mapping keys are retained; absent mappings use defaults. Files produced by a newer unsupported version are backed up rather than silently interpreted.
 
 ## Verification
 
-`swift test` exercises direction hysteresis, stop grace, slowdown recovery, interface resets/churn, 64-bit counters, wake gaps, temporary-event priority, configuration round trips, corruption backups, pack containment, duplicate import handling, all 36 Blue Turtle frames, variable frame timing, and a real system-counter read. See `VERIFICATION.md` for the checks performed on the delivered build.
+`swift test` exercises direction hysteresis, stop grace, slowdown recovery, interface resets/churn, 64-bit counters, wake gaps, temporary-event priority, configuration migration, corruption backups, pack containment, duplicate imports, all 48 Blue Turtle frames, variable frame timing, and a real system-counter read. Task-activity tests cover lifecycle/input handling, concurrent tasks, historical replay suppression, stale sessions, partial/oversize lines, incremental reads, file replacement, missing folders, and coexistence with network events. See `VERIFICATION.md` for the checks performed on the delivered build.
 
 For a manual check: open Settings → Events; preview all five animations; change one mapping; quit/reopen to check persistence; restore defaults. During a transfer, inspect Network rates and direction. Hide/show, pause/resume, drag, enable click-through, recenter, and check external-display removal or sleep/wake on your own setup.
 

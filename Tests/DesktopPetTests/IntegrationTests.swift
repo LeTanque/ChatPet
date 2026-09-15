@@ -12,7 +12,7 @@ import PetCore
     #expect(library.warnings.isEmpty)
     let turtle = try #require(library.pets.first)
     #expect(turtle.id == "builtin.blue-turtle")
-    #expect(turtle.images.values.reduce(0) { $0 + $1.count } == 36)
+    #expect(turtle.images.values.reduce(0) { $0 + $1.count } == 48)
     for animation in PetAnimation.allCases {
         let frames = try #require(turtle.images[animation.rawValue])
         #expect(!frames.isEmpty)

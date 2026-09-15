@@ -14,11 +14,13 @@ final class AppModel: ObservableObject {
     @Published private(set) var rate = NetworkRate.zero
     @Published private(set) var interfaces: [String] = []
     @Published private(set) var networkStatus = "Starting network monitor…"
+    @Published private(set) var codexStatus = "Task activity off"
     @Published var message: String?
     let store: ConfigurationStore
     let library: PetLibrary
     private var sources: [any PetEventSource] = []
     private var router = EventRouter()
+    private var codexEvent: PetEvent?
     private var timer: Timer?
     private var saveTask: Task<Void, Never>?
     private var preview: (PetAnimation, Double)?
@@ -79,7 +81,7 @@ final class AppModel: ObservableObject {
         let previous = configuration
         var new = configuration; change(&new); new.normalize(); configuration = new
         petWindow?.apply(configuration)
-        if previous.network != new.network || previous.networkEnabled != new.networkEnabled ||
+        if previous.codex != new.codex || previous.network != new.network || previous.networkEnabled != new.networkEnabled ||
             previous.paused != new.paused || previous.visible != new.visible ||
             previous.occasionalEnabled != new.occasionalEnabled || previous.occasionalMinimum != new.occasionalMinimum ||
             previous.occasionalMaximum != new.occasionalMaximum {
@@ -108,8 +110,11 @@ final class AppModel: ObservableObject {
     func recenter() { petWindow?.recenter() }
     private func restartSources() {
         sources.forEach { $0.stop() }; sources = []; router.reset(); preview = nil; rate = .zero
+        codexEvent = nil
+        codexStatus = configuration.codex.enabled ? "Reading local task activity…" : "Task activity off"
         guard !configuration.paused, configuration.visible, !sleeping else {
             networkStatus = sleeping ? "Sleeping" : configuration.paused ? "Paused" : "Pet hidden"
+            codexStatus = networkStatus
             return
         }
         if configuration.networkEnabled {
@@ -119,6 +124,7 @@ final class AppModel: ObservableObject {
         if configuration.occasionalEnabled {
             sources.append(OccasionalEventSource(interval: configuration.occasionalMinimum...configuration.occasionalMaximum))
         }
+        if configuration.codex.enabled { sources.append(CodexEventSource(settings: configuration.codex)) }
         sources.forEach { source in source.start { [weak self] update in self?.receive(update) } }
     }
     private func receive(_ update: SourceUpdate) {
@@ -133,12 +139,18 @@ final class AppModel: ObservableObject {
             router.receive(event, at: now, duration: configuration.occasionalDuration, priority: 10)
         case let .unavailable(reason):
             networkStatus = reason; rate = .zero; router.reset()
+        case let .codex(summary):
+            codexEvent = summary.event
+            codexStatus = "\(summary.workingCount) working · \(summary.waitingCount) waiting · \(summary.monitoredCount) local sessions"
+            if summary.unreadableCount > 0 { codexStatus += " · \(summary.unreadableCount) unreadable" }
+        case let .codexUnavailable(reason):
+            codexEvent = nil; codexStatus = reason
         }
         tick()
     }
     private var now: Double { ProcessInfo.processInfo.systemUptime }
     private func tick() {
-        let event = router.currentEvent(at: now)
+        let event = router.currentEvent(at: now, preferredEvent: codexEvent)
         if self.event != event { self.event = event }
         var desired = configuration.animation(for: event)
         if let override = preview {
@@ -155,6 +167,15 @@ final class AppModel: ObservableObject {
     func reloadPets() {
         library.reload(); pets = library.pets
         if !library.warnings.isEmpty { message = library.warnings.joined(separator: "\n") }
+    }
+    func chooseSessionsFolder() {
+        let panel = NSOpenPanel()
+        panel.title = "Choose the Codex sessions folder"
+        panel.canChooseDirectories = true; panel.canChooseFiles = false; panel.allowsMultipleSelection = false
+        panel.showsHiddenFiles = true
+        panel.directoryURL = URL(fileURLWithPath: (configuration.codex.sessionsDirectory as NSString).expandingTildeInPath)
+        guard panel.runModal() == .OK, let folder = panel.url else { return }
+        update { $0.codex.sessionsDirectory = folder.path }
     }
     func importPet() {
         NSApp.activate(ignoringOtherApps: true)

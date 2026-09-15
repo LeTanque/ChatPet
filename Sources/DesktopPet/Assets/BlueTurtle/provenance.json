@@ -38,6 +38,18 @@
     "frames/running/02.png": "23097910fd489616a9328ecf8597217b28cdde30eb2b19bcbae3b52437d6cf46",
     "frames/running/03.png": "dc1d84c312ed85a7c18ee7854161abfea2eb692fbea4140007c8a9ecff7e3747",
     "frames/running/04.png": "01fca8efc45a65db988bac3669312bbc0e780536df245e58d0beb72045e45ad2",
-    "frames/running/05.png": "a8857f34c2d84ea6876b9121518eff384f0f86d20ff2af12755eb05a32cd6b7b"
+    "frames/running/05.png": "a8857f34c2d84ea6876b9121518eff384f0f86d20ff2af12755eb05a32cd6b7b",
+    "frames/waiting/00.png": "5b116e2d7b50066204a93d74d0b88bbfdf6f0e7477cce2399c16a4149fe35a36",
+    "frames/waiting/01.png": "1ba7fbc361d838edf232fce52f74fb73d432a149bbfda92536307668f7ea1148",
+    "frames/waiting/02.png": "484e96ee1face659cc55a36c8c4b8484f4cc6922849c5c6ede7bcf7e80d3523a",
+    "frames/waiting/03.png": "7040ab15354460b05bf0761b121e56946f1efb7a1f219324a4dcf1515461599b",
+    "frames/waiting/04.png": "e159e867b8a056dd3bc5d40340636a7abf26c12c2f266e478e098ddc7ac98ba5",
+    "frames/waiting/05.png": "7c30c2d89ad795eb4d4559c45fd8c0402c75d986893819d2fb095ade1f092857",
+    "frames/review/00.png": "c7f477a7d46e1d1e2fb2d10a5f518dc72dfaa07b11f419951b6bb3db3e7b5d13",
+    "frames/review/01.png": "2c726a3d1773867d7a2d7ff097023c682f7a344daf0e723b3a2abe39311eded7",
+    "frames/review/02.png": "4c9f3c1e351f4e26b083e1f3feaba8516805ae2b346f13b5eb63eb670b6d5b12",
+    "frames/review/03.png": "12394e486baaceaa9a77b73afe77655095943da23c9399d08059c92c1120491a",
+    "frames/review/04.png": "a5a8e69ec41d7e11a3cad9e5f260689f92e5d5367373a275a94fa496316912a8",
+    "frames/review/05.png": "0bab453b7112e9ae0b20f91f7b271c99b0e68e6c07654d479735453acafdbfbb"
   }
 }

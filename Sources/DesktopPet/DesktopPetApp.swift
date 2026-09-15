@@ -8,10 +8,11 @@ struct DesktopPetApp: App {
     @StateObject private var model = AppModel.shared
     var body: some Scene {
         MenuBarExtra("DesktopPet", systemImage: "pawprint.fill") {
-            Text("\(model.currentPet.manifest.name) · \(model.animation.title)")
+            Text(model.currentPet.manifest.name)
             Divider()
             Toggle("Show pet", isOn: model.binding(\.visible))
             Toggle("Pause", isOn: model.binding(\.paused))
+            Toggle("Codex task activity", isOn: model.binding(\.codex.enabled))
             Picker("Choose pet", selection: model.binding(\.selectedPet)) {
                 ForEach(model.pets) { pet in Text(pet.manifest.name).tag(pet.id) }
             }

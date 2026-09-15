@@ -112,6 +112,44 @@
         0.12,
         0.22
       ]
+    },
+    "waiting": {
+      "frames": [
+        "frames/waiting/00.png",
+        "frames/waiting/01.png",
+        "frames/waiting/02.png",
+        "frames/waiting/03.png",
+        "frames/waiting/04.png",
+        "frames/waiting/05.png"
+      ],
+      "framesPerSecond": 8,
+      "frameDurations": [
+        0.15,
+        0.15,
+        0.15,
+        0.15,
+        0.15,
+        0.26
+      ]
+    },
+    "celebration": {
+      "frames": [
+        "frames/review/00.png",
+        "frames/review/01.png",
+        "frames/review/02.png",
+        "frames/review/03.png",
+        "frames/review/04.png",
+        "frames/review/05.png"
+      ],
+      "framesPerSecond": 8,
+      "frameDurations": [
+        0.15,
+        0.15,
+        0.15,
+        0.15,
+        0.15,
+        0.28
+      ]
     }
   }
 }

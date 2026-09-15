@@ -34,7 +34,7 @@ private struct ProceduralPet: View {
             context.scaleBy(x: size.width / 192, y: size.height / 208)
             let running = animation.direction != 0
             let stride = running ? sin(elapsed * 16) * 9 : 0
-            let bob = running ? abs(sin(elapsed * 16)) * 4 : sin(elapsed * 2) * 2
+            let bob = animation == .celebration ? abs(sin(elapsed * 6)) * 18 : running ? abs(sin(elapsed * 16)) * 4 : sin(elapsed * 2) * 2
             let failed = animation == .failed
             let ink = Color(red: 0.16, green: 0.20, blue: 0.25)
             let body = Color(hex: pack.bodyColor)
@@ -76,6 +76,8 @@ private struct ProceduralPet: View {
                 if failed {
                     line([CGPoint(x: x - 5, y: 89), CGPoint(x: x + 5, y: 99)], color: eyeColor)
                     line([CGPoint(x: x + 5, y: 89), CGPoint(x: x - 5, y: 99)], color: eyeColor)
+                } else if animation == .celebration {
+                    line([CGPoint(x: x - 5, y: 95), CGPoint(x: x, y: 89), CGPoint(x: x + 5, y: 95)], color: eyeColor)
                 } else {
                     context.fill(Path(roundedRect: CGRect(x: x - 4, y: 87, width: 8, height: blink ? 3 : 15), cornerRadius: 4), with: .color(eyeColor))
                 }
@@ -87,6 +89,9 @@ private struct ProceduralPet: View {
                 shape(CGRect(x: 91, y: 135, width: 74, height: 46), color: ink, radius: 5)
                 line([CGPoint(x: 76, y: 183), CGPoint(x: 167, y: 183)], color: accent, width: 7)
                 line([CGPoint(x: 122, y: 149), CGPoint(x: 130, y: 155), CGPoint(x: 122, y: 161)], color: accent)
+            }
+            if animation == .waiting {
+                context.draw(Text("?").font(.system(size: 28, weight: .bold)).foregroundColor(ink), at: CGPoint(x: 164, y: 49))
             }
         }
     }
