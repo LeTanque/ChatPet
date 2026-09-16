@@ -8,7 +8,7 @@ struct DesktopPetApp: App {
     @StateObject private var model = AppModel.shared
     var body: some Scene {
         MenuBarExtra("DesktopPet", systemImage: "pawprint.fill") {
-            Text("\(model.currentPet.manifest.name) · \(model.animation.title)")
+            Text(model.currentPet.manifest.name)
             Divider()
             Toggle("Show pet", isOn: model.binding(\.visible))
             Toggle("Pause", isOn: model.binding(\.paused))
