@@ -3,8 +3,8 @@
   "id": "builtin.blue-turtle",
   "name": "Blue Turtle",
   "species": "robot",
-  "bodyColor": "#4DA9EB",
-  "accentColor": "#55EDF5",
+  "bodyColor": "#5DA8F8",
+  "accentColor": "#3FEDF5",
   "clips": {
     "idle": {
       "frames": [
