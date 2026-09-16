@@ -8,15 +8,15 @@ final class AppModel: ObservableObject {
     static let shared = AppModel()
     @Published private(set) var configuration: PetConfiguration
     @Published private(set) var pets: [LoadedPet] = []
-    // Frame-driving state is read by PetView's TimelineView. Keeping it out of
-    // ObservableObject publications prevents the menu bar menu from rebuilding
-    // whenever the animation changes.
+    // Frame- and event-driven state is read by PetView's TimelineView (and Settings
+    // when open). Keeping it out of @Published prevents the menu bar menu from
+    // rebuilding whenever the pet animates or network samples arrive.
     private(set) var animation: PetAnimation = .idle
     private(set) var animationStarted = ProcessInfo.processInfo.systemUptime
-    @Published private(set) var event: PetEvent = .idle
-    @Published private(set) var rate = NetworkRate.zero
-    @Published private(set) var interfaces: [String] = []
-    @Published private(set) var networkStatus = "Starting network monitor…"
+    private(set) var event: PetEvent = .idle
+    private(set) var rate = NetworkRate.zero
+    private(set) var interfaces: [String] = []
+    private(set) var networkStatus = "Starting network monitor…"
     @Published var message: String?
     let store: ConfigurationStore
     let library: PetLibrary
@@ -109,16 +109,21 @@ final class AppModel: ObservableObject {
         scheduleSave()
     }
     func recenter() { petWindow?.recenter() }
+    private func refreshSettingsIfVisible() {
+        if settingsWindow?.isVisible == true { objectWillChange.send() }
+    }
     private func restartSources() {
         sources.forEach { $0.stop() }; sources = []; router.reset(); preview = nil; rate = .zero
         guard !configuration.paused, configuration.visible, !sleeping else {
             networkStatus = sleeping ? "Sleeping" : configuration.paused ? "Paused" : "Pet hidden"
+            refreshSettingsIfVisible()
             return
         }
         if configuration.networkEnabled {
             networkStatus = "Measuring network activity…"
             sources.append(NetworkEventSource(settings: configuration.network))
         } else { networkStatus = "Network trigger off" }
+        refreshSettingsIfVisible()
         if configuration.occasionalEnabled {
             sources.append(OccasionalEventSource(interval: configuration.occasionalMinimum...configuration.occasionalMaximum))
         }
@@ -137,18 +142,22 @@ final class AppModel: ObservableObject {
         case let .unavailable(reason):
             networkStatus = reason; rate = .zero; router.reset()
         }
+        refreshSettingsIfVisible()
         tick()
     }
     private var now: Double { ProcessInfo.processInfo.systemUptime }
     private func tick() {
         let event = router.currentEvent(at: now)
-        if self.event != event { self.event = event }
+        if self.event != event { self.event = event; refreshSettingsIfVisible() }
         var desired = configuration.animation(for: event)
         if let override = preview {
             if override.1 > now { desired = override.0 } else { preview = nil }
         }
         if configuration.paused || sleeping { desired = .idle }
-        if animation != desired { animation = desired; animationStarted = now }
+        if animation != desired {
+            animation = desired; animationStarted = now
+            refreshSettingsIfVisible()
+        }
         petWindow?.advance(direction: animation.direction, moving: isAnimating && configuration.movementEnabled)
     }
     func previewAnimation(_ value: PetAnimation) {
