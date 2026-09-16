@@ -8,8 +8,11 @@ final class AppModel: ObservableObject {
     static let shared = AppModel()
     @Published private(set) var configuration: PetConfiguration
     @Published private(set) var pets: [LoadedPet] = []
-    @Published private(set) var animation: PetAnimation = .idle
-    @Published private(set) var animationStarted = ProcessInfo.processInfo.systemUptime
+    // Frame-driving state is read by PetView's TimelineView. Keeping it out of
+    // ObservableObject publications prevents the menu bar menu from rebuilding
+    // whenever the animation changes.
+    private(set) var animation: PetAnimation = .idle
+    private(set) var animationStarted = ProcessInfo.processInfo.systemUptime
     @Published private(set) var event: PetEvent = .idle
     @Published private(set) var rate = NetworkRate.zero
     @Published private(set) var interfaces: [String] = []
