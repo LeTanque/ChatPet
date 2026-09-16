@@ -8,11 +8,10 @@ struct DesktopPetApp: App {
     @StateObject private var model = AppModel.shared
     var body: some Scene {
         MenuBarExtra("DesktopPet", systemImage: "pawprint.fill") {
-            Text(model.currentPet.manifest.name)
+            Text("\(model.currentPet.manifest.name) · \(model.animation.title)")
             Divider()
             Toggle("Show pet", isOn: model.binding(\.visible))
             Toggle("Pause", isOn: model.binding(\.paused))
-            Toggle("Codex task activity", isOn: model.binding(\.codex.enabled))
             Picker("Choose pet", selection: model.binding(\.selectedPet)) {
                 ForEach(model.pets) { pet in Text(pet.manifest.name).tag(pet.id) }
             }
@@ -41,6 +40,10 @@ struct DesktopPetApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        if let iconURL = Bundle.main.url(forResource: "ChatPetIcon", withExtension: "png"),
+           let icon = NSImage(contentsOf: iconURL) {
+            NSApp.applicationIconImage = icon
+        }
         AppModel.shared.start()
     }
     func applicationWillTerminate(_ notification: Notification) { AppModel.shared.shutdown() }

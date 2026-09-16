@@ -26,7 +26,6 @@ struct SettingsView: View {
                 petSettings.tabItem { Label("Pet", systemImage: "pawprint") }
                 eventSettings.tabItem { Label("Events", systemImage: "bolt") }
                 networkSettings.tabItem { Label("Network", systemImage: "network") }
-                activitySettings.tabItem { Label("Task activity", systemImage: "desktopcomputer") }
             }.padding([.horizontal, .bottom], 16)
             HStack {
                 Text(model.networkStatus).font(.caption).foregroundStyle(.secondary).lineLimit(2)
@@ -68,7 +67,7 @@ struct SettingsView: View {
     private var eventSettings: some View {
         Form {
             Section("When an event happens") {
-                ForEach(PetEvent.allCases.filter { !$0.isTaskEvent }) { event in
+                ForEach(PetEvent.allCases) { event in
                     HStack {
                         Picker(event.title, selection: Binding(get: { model.configuration.animation(for: event) }, set: { value in
                             model.update { $0.mappings[event.rawValue] = value }
@@ -122,43 +121,6 @@ struct SettingsView: View {
             }
             Text("Local interface counters only. No packet inspection, traffic logs, analytics, or network requests.")
                 .font(.caption).foregroundStyle(.secondary)
-        }.formStyle(.grouped)
-    }
-    private var activitySettings: some View {
-        Form {
-            Section("Codex task activity") {
-                Toggle("React to local Codex tasks", isOn: model.binding(\.codex.enabled))
-                Text("Watch tasks work, wait for a reply, finish, or stop. Task activity takes priority over network animations; network activity resumes when tasks are quiet.")
-                    .font(.caption).foregroundStyle(.secondary)
-                LabeledContent("Status", value: model.codexStatus)
-                Text(model.configuration.codex.sessionsDirectory).font(.caption.monospaced()).textSelection(.enabled)
-                HStack {
-                    Button("Choose sessions folder…") { model.chooseSessionsFolder() }
-                    Button("Use default folder") { model.update { $0.codex.sessionsDirectory = "~/.codex/sessions" } }
-                }
-            }
-            Section("Task animations") {
-                ForEach(PetEvent.allCases.filter(\.isTaskEvent)) { event in
-                    HStack {
-                        Picker(event.title, selection: Binding(get: { model.configuration.animation(for: event) }, set: { value in
-                            model.update { $0.mappings[event.rawValue] = value }
-                        })) {
-                            ForEach(PetAnimation.allCases) { animation in Text(animation.title).tag(animation) }
-                        }
-                        Button { model.previewAnimation(model.configuration.animation(for: event)) } label: {
-                            Image(systemName: "play.fill")
-                        }.help("Preview for six seconds").accessibilityLabel("Preview \(event.title)")
-                    }
-                }
-                numberField("Completion / failure duration (seconds)", \.codex.reactionDuration)
-                numberField("Ignore inactive tasks after (seconds)", \.codex.staleAfter)
-            }
-            Section("Local and optional") {
-                Text("Reads event metadata from local session files. No account connection, hooks, or ChatGPT changes. ChatPet does not display, save, or send conversation text.")
-                    .font(.caption).foregroundStyle(.secondary)
-                Text("Covers local Codex tasks, not browser chats or cloud-only tasks. Waiting requires a recorded blocking input request. Approval dialogs and unread-review status that exist only inside ChatGPT are not available through this adapter.")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
         }.formStyle(.grouped)
     }
     private func numberField(_ title: String, _ keyPath: WritableKeyPath<PetConfiguration, Double>) -> some View {

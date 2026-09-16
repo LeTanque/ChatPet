@@ -5,8 +5,6 @@ enum SourceUpdate {
     case network(NetworkRate, PetEvent, [String])
     case event(PetEvent)
     case unavailable(String)
-    case codex(CodexActivitySummary)
-    case codexUnavailable(String)
 }
 
 @MainActor
@@ -69,32 +67,6 @@ final class OccasionalEventSource: PetEventSource {
                 do { try await Task.sleep(for: .seconds(Double.random(in: interval))) } catch { return }
                 guard !Task.isCancelled else { return }
                 deliver(.event(.occasional))
-            }
-        }
-    }
-    func stop() { task?.cancel(); task = nil }
-}
-
-@MainActor
-final class CodexEventSource: PetEventSource {
-    private let settings: CodexSettings
-    private var task: Task<Void, Never>?
-    init(settings: CodexSettings) { self.settings = settings }
-    func start(deliver: @escaping @MainActor (SourceUpdate) -> Void) {
-        stop()
-        let root = URL(fileURLWithPath: (settings.sessionsDirectory as NSString).expandingTildeInPath, isDirectory: true)
-        let reader = CodexSessionReader(root: root)
-        task = Task { [settings] in
-            while !Task.isCancelled {
-                do {
-                    let summary = try await reader.poll(staleAfter: settings.staleAfter, reactionDuration: settings.reactionDuration)
-                    guard !Task.isCancelled else { return }
-                    deliver(.codex(summary))
-                } catch {
-                    guard !Task.isCancelled else { return }
-                    deliver(.codexUnavailable(error.localizedDescription))
-                }
-                do { try await Task.sleep(for: .seconds(1)) } catch { return }
             }
         }
     }

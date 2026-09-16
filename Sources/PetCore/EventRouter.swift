@@ -15,11 +15,11 @@ public struct EventRouter: Sendable {
             baseEvent = event
         }
     }
-    public mutating func currentEvent(at time: Double, preferredEvent: PetEvent? = nil) -> PetEvent {
+    public mutating func currentEvent(at time: Double) -> PetEvent {
         if let current = transient {
-            if current.deadline > time { return preferredEvent ?? current.event }
+            if current.deadline > time { return current.event }
             transient = nil
         }
-        return preferredEvent ?? baseEvent
+        return baseEvent
     }
 }
