@@ -8,6 +8,7 @@ app="${OUTPUT_DIR:-dist}/DesktopPet.app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$binary_dir/DesktopPet" "$app/Contents/MacOS/DesktopPet"
 cp Resources/Info.plist "$app/Contents/Info.plist"
+cp Resources/ChatPetIcon.png "$app/Contents/Resources/ChatPetIcon.png"
 # PetLibrary checks app resources first, then SwiftPM's development bundle.
 resource_bundle="DesktopPet_DesktopPet.bundle"
 if [ -d "$app/Contents/Resources/$resource_bundle" ]; then
