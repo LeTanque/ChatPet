@@ -18,9 +18,11 @@ final class PetLibrary {
         pets = []; warnings = []
         let packaged = Bundle.main.resourceURL?.appendingPathComponent("DesktopPet_DesktopPet.bundle")
         let resources = packaged.flatMap { Bundle(url: $0) } ?? Bundle.module
-        let bundled = resources.resourceURL!.appendingPathComponent("Assets/BlueTurtle")
-        do { pets.append(try load(folder: bundled)) }
-        catch { warnings.append("Blue Turtle: \(error.localizedDescription)") }
+        for bundledName in ["BlueTurtle", "Michelangelo"] {
+            let bundled = resources.resourceURL!.appendingPathComponent("Assets/\(bundledName)")
+            do { pets.append(try load(folder: bundled)) }
+            catch { warnings.append("\(bundledName): \(error.localizedDescription)") }
+        }
         pets += PetPack.builtins.map { LoadedPet(manifest: $0) }
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

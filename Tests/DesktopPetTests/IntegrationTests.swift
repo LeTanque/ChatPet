@@ -4,19 +4,20 @@ import PetCore
 @testable import DesktopPet
 
 @MainActor
-@Test func bundledBlueTurtleLoadsEveryRequestedAnimation() throws {
+@Test func bundledSpritePacksLoadEveryRequestedAnimation() throws {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: directory) }
     let library = PetLibrary(directory: directory)
     library.reload()
     #expect(library.warnings.isEmpty)
-    let turtle = try #require(library.pets.first)
-    #expect(turtle.id == "builtin.blue-turtle")
-    #expect(turtle.images.values.reduce(0) { $0 + $1.count } == 36)
-    for animation in PetAnimation.allCases {
-        let frames = try #require(turtle.images[animation.rawValue])
-        #expect(!frames.isEmpty)
-        #expect(frames.allSatisfy { $0.size.width == 192 && $0.size.height == 208 })
+    for id in ["builtin.blue-turtle", "builtin.michelangelo"] {
+        let pet = try #require(library.pets.first { $0.id == id })
+        #expect(pet.images.values.reduce(0) { $0 + $1.count } == 36)
+        for animation in PetAnimation.allCases {
+            let frames = try #require(pet.images[animation.rawValue])
+            #expect(!frames.isEmpty)
+            #expect(frames.allSatisfy { $0.size.width == 192 && $0.size.height == 208 })
+        }
     }
 }
 
