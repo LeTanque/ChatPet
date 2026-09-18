@@ -59,7 +59,7 @@ struct SettingsView: View {
                     Button("Reload packs") { model.reloadPets() }
                 }
                 Button("Open pet packs folder") { NSWorkspace.shared.open(model.store.packsDirectory) }
-                Text("Import a folder containing pet.json and optional PNG frames. Blue Turtle and Michelangelo use bundled artwork; Mochi, Ember, and Pip are additional built-in pets.")
+                Text("Import a folder containing pet.json and PNG frames (see the repo pets/ folder for Michelangelo). Blue Turtle and Michelangelo ship with the app; Mochi, Ember, and Pip are additional built-in pets.")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }.formStyle(.grouped)

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "id": "builtin.michelangelo",
+  "name": "Michelangelo",
+  "species": "robot",
+  "bodyColor": "#5DBF4A",
+  "accentColor": "#F7941D",
+  "clips": {
+    "idle": {
+      "frames": [
+        "frames/idle/00.png",
+        "frames/idle/01.png",
+        "frames/idle/02.png",
+        "frames/idle/03.png",
+        "frames/idle/04.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "idleReady": {
+      "frames": [
+        "frames/idleReady/00.png",
+        "frames/idleReady/01.png",
+        "frames/idleReady/02.png",
+        "frames/idleReady/03.png",
+        "frames/idleReady/04.png",
+        "frames/idleReady/05.png",
+        "frames/idleReady/06.png",
+        "frames/idleReady/07.png",
+        "frames/idleReady/08.png",
+        "frames/idleReady/09.png",
+        "frames/idleReady/10.png",
+        "frames/idleReady/11.png",
+        "frames/idleReady/12.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "runRight": {
+      "frames": [
+        "frames/runRight/00.png",
+        "frames/runRight/01.png",
+        "frames/runRight/02.png",
+        "frames/runRight/03.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "shocked": {
+      "frames": [
+        "frames/shocked/00.png",
+        "frames/shocked/01.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.2
+      ]
+    },
+    "fallOver": {
+      "frames": [
+        "frames/fallOver/00.png",
+        "frames/fallOver/01.png",
+        "frames/fallOver/02.png",
+        "frames/fallOver/03.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "whirlwind": {
+      "frames": [
+        "frames/whirlwind/00.png",
+        "frames/whirlwind/01.png",
+        "frames/whirlwind/02.png",
+        "frames/whirlwind/03.png",
+        "frames/whirlwind/04.png",
+        "frames/whirlwind/05.png",
+        "frames/whirlwind/06.png",
+        "frames/whirlwind/07.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "uppercut": {
+      "frames": [
+        "frames/uppercut/00.png",
+        "frames/uppercut/01.png",
+        "frames/uppercut/02.png",
+        "frames/uppercut/03.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "burned": {
+      "frames": [
+        "frames/burned/00.png",
+        "frames/burned/01.png",
+        "frames/burned/02.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "runLeft": {
+      "frames": [
+        "frames/runLeft/00.png",
+        "frames/runLeft/01.png",
+        "frames/runLeft/02.png",
+        "frames/runLeft/03.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    }
+  }
+}

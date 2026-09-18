@@ -11,7 +11,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = ROOT / "pets"
+PACK = ROOT / "pets"
 OUT = ROOT / "Preview/michelangelo"
 ASSETS = ROOT / "Sources/DesktopPet/Assets/Michelangelo"
 
@@ -137,7 +137,7 @@ def split_whirlwind_row(path: Path) -> list[tuple[int, int, int, int]]:
 
 def boxes_for_clip(clip_id: str) -> list[tuple[int, int, int, int]]:
     filename, mode, count = CLIP_SOURCES[clip_id]
-    path = SOURCES / filename
+    path = PACK / filename
     if not path.is_file():
         raise FileNotFoundError(path)
     if mode == "whirlwind":
@@ -223,10 +223,7 @@ def default_durations(frame_count: int, hold_last: float = 0.2) -> list[float]:
     return durations
 
 
-    return durations
-
-
-def install_app_assets(manifest: dict) -> None:
+def pack_manifest(manifest: dict) -> dict:
     clips: dict[str, dict] = {}
     for clip_id, info in manifest["clips"].items():
         clips[clip_id] = {
@@ -234,7 +231,7 @@ def install_app_assets(manifest: dict) -> None:
             "framesPerSecond": info["framesPerSecond"],
             "frameDurations": info["frameDurations"],
         }
-    pack = {
+    return {
         "schemaVersion": 1,
         "id": "builtin.michelangelo",
         "name": "Michelangelo",
@@ -243,34 +240,56 @@ def install_app_assets(manifest: dict) -> None:
         "accentColor": "#F7941D",
         "clips": clips,
     }
+
+
+def write_pack_config(manifest: dict) -> None:
+    pack = pack_manifest(manifest)
+    (PACK / "pet.json").write_text(json.dumps(pack, indent=2) + "\n")
+    provenance = {
+        "source": "Horizontal animation strips in this folder; frames normalized to 192×208",
+        "copyMethod": "Scripts/build-michelangelo-preview.py",
+        "strips": {clip_id: info["source"] for clip_id, info in manifest["clips"].items()},
+    }
+    (PACK / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+
+
+def sync_preview(manifest: dict) -> None:
+    OUT.mkdir(parents=True, exist_ok=True)
+    preview_frames = OUT / "frames"
+    if preview_frames.exists():
+        shutil.rmtree(preview_frames)
+    shutil.copytree(PACK / "frames", preview_frames)
+    (OUT / "preview-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    embed = "window.__PREVIEW_MANIFEST__ = " + json.dumps(manifest) + ";\n"
+    (OUT / "preview-data.js").write_text(embed)
+
+
+def install_app_assets() -> None:
+    """Copy pets/ pack (manifest + frames) into the app bundle resources."""
     ASSETS.mkdir(parents=True, exist_ok=True)
+    for name in ("pet.json", "provenance.json"):
+        shutil.copy2(PACK / name, ASSETS / name)
     frames_dir = ASSETS / "frames"
     if frames_dir.exists():
         shutil.rmtree(frames_dir)
-    shutil.copytree(OUT / "frames", frames_dir)
-    (ASSETS / "pet.json").write_text(json.dumps(pack, indent=2) + "\n")
-    provenance = {
-        "source": "TMNT arcade-style strips in pets/; normalized to 192×208 with foot anchoring",
-        "copyMethod": "Scripts/build-michelangelo-preview.py",
-        "previewManifest": "Preview/michelangelo/preview-manifest.json",
-    }
-    (ASSETS / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    shutil.copytree(PACK / "frames", frames_dir)
     print(f"Installed app pack → {ASSETS}")
 
 
 def main() -> int:
     install = "--install" in sys.argv
-    if not SOURCES.is_dir():
-        print(f"Missing pets folder: {SOURCES}", file=sys.stderr)
+    if not PACK.is_dir():
+        print(f"Missing pet folder: {PACK}", file=sys.stderr)
         return 1
 
-    if OUT.joinpath("frames").exists():
-        shutil.rmtree(OUT / "frames")
+    pack_frames = PACK / "frames"
+    if pack_frames.exists():
+        shutil.rmtree(pack_frames)
     sheet_cache: dict[str, Image.Image] = {}
 
     def load_sheet(filename: str) -> Image.Image:
         if filename not in sheet_cache:
-            sheet_cache[filename] = Image.open(SOURCES / filename).convert("RGBA")
+            sheet_cache[filename] = Image.open(PACK / filename).convert("RGBA")
         return sheet_cache[filename]
 
     manifest: dict = {
@@ -293,13 +312,13 @@ def main() -> int:
             "anchor_feet": clip_id in FOOT_ANCHOR_CLIPS,
             **COMPOSE_OPTS.get(clip_id, {}),
         }
-        folder = OUT / "frames" / clip_id
+        folder = pack_frames / clip_id
         folder.mkdir(parents=True, exist_ok=True)
         paths: list[str] = []
         for index, box in enumerate(boxes):
             frame = compose_frame(sheet, box, flip=False, **opts)
             rel = f"frames/{clip_id}/{index:02d}.png"
-            frame.save(OUT / rel)
+            frame.save(PACK / rel)
             paths.append(rel)
         manifest["clips"][clip_id] = {
             "source": filename,
@@ -318,13 +337,13 @@ def main() -> int:
         "content_height": TARGET_CONTENT_HEIGHT,
         "anchor_feet": True,
     }
-    folder = OUT / "frames/runLeft"
+    folder = pack_frames / "runLeft"
     folder.mkdir(parents=True, exist_ok=True)
     left_paths: list[str] = []
     for index, box in enumerate(run_boxes):
         frame = compose_frame(run_sheet, box, flip=True, **run_opts)
         rel = f"frames/runLeft/{index:02d}.png"
-        frame.save(OUT / rel)
+        frame.save(PACK / rel)
         left_paths.append(rel)
     manifest["clips"]["runLeft"] = {
         "source": "walkright.png (mirrored)",
@@ -334,14 +353,13 @@ def main() -> int:
         "frameDurations": default_durations(len(left_paths)),
     }
 
-    (OUT / "preview-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    embed = "window.__PREVIEW_MANIFEST__ = " + json.dumps(manifest) + ";\n"
-    (OUT / "preview-data.js").write_text(embed)
-    print(f"Built {len(manifest['clips'])} clips → {OUT}")
+    write_pack_config(manifest)
+    sync_preview(manifest)
+    print(f"Built {len(manifest['clips'])} clips → {PACK}")
     for clip_id, info in manifest["clips"].items():
         print(f"  {clip_id}: {info['frameCount']} frames")
     if install:
-        install_app_assets(manifest)
+        install_app_assets()
     return 0
 
 
