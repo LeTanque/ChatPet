@@ -1,15 +1,22 @@
 import Foundation
 
 public enum PetAnimation: String, Codable, CaseIterable, Sendable, Identifiable {
-    case idle, runLeft, runRight, failed, laptop
+    case idle, idleReady, runLeft, runRight, failed, laptop
+    case shocked, fallOver, whirlwind, uppercut, burned
     public var id: String { rawValue }
     public var title: String {
         switch self {
         case .idle: "Idle"
+        case .idleReady: "Idle ready"
         case .runLeft: "Run left"
         case .runRight: "Run right"
         case .failed: "Failed / tired"
         case .laptop: "Viewing laptop"
+        case .shocked: "Shocked"
+        case .fallOver: "Knocked down"
+        case .whirlwind: "Whirlwind spin"
+        case .uppercut: "Uppercut"
+        case .burned: "Burned / panting"
         }
     }
     public var direction: Double {

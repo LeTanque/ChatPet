@@ -4,20 +4,35 @@ import PetCore
 @testable import DesktopPet
 
 @MainActor
-@Test func bundledSpritePacksLoadEveryRequestedAnimation() throws {
+@Test func bundledBlueTurtleLoadsEveryRequestedAnimation() throws {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: directory) }
     let library = PetLibrary(directory: directory)
     library.reload()
     #expect(library.warnings.isEmpty)
-    for id in ["builtin.blue-turtle", "builtin.michelangelo"] {
-        let pet = try #require(library.pets.first { $0.id == id })
-        #expect(pet.images.values.reduce(0) { $0 + $1.count } == 36)
-        for animation in PetAnimation.allCases {
-            let frames = try #require(pet.images[animation.rawValue])
-            #expect(!frames.isEmpty)
-            #expect(frames.allSatisfy { $0.size.width == 192 && $0.size.height == 208 })
-        }
+    let turtle = try #require(library.pets.first)
+    #expect(turtle.id == "builtin.blue-turtle")
+    #expect(turtle.images.values.reduce(0) { $0 + $1.count } == 36)
+    for (animation, _) in turtle.manifest.clips {
+        let frames = try #require(turtle.images[animation])
+        #expect(!frames.isEmpty)
+        #expect(frames.allSatisfy { $0.size.width == 192 && $0.size.height == 208 })
+    }
+}
+
+@MainActor
+@Test func bundledMichelangeloLoadsEveryClip() throws {
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let library = PetLibrary(directory: directory)
+    library.reload()
+    let mikey = try #require(library.pets.first { $0.id == "builtin.michelangelo" })
+    #expect(mikey.manifest.clips.count == 9)
+    #expect(mikey.images.values.reduce(0) { $0 + $1.count } == 47)
+    for (animation, _) in mikey.manifest.clips {
+        let frames = try #require(mikey.images[animation])
+        #expect(!frames.isEmpty)
+        #expect(frames.allSatisfy { $0.size.width == 192 && $0.size.height == 208 })
     }
 }
 

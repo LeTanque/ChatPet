@@ -1,0 +1,186 @@
+{
+  "name": "Michelangelo (preview)",
+  "canvas": {
+    "width": 192,
+    "height": 208
+  },
+  "contentHeight": 158,
+  "footPadding": 9,
+  "clips": {
+    "idle": {
+      "source": "idle.png",
+      "frameCount": 5,
+      "paths": [
+        "frames/idle/00.png",
+        "frames/idle/01.png",
+        "frames/idle/02.png",
+        "frames/idle/03.png",
+        "frames/idle/04.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "idleReady": {
+      "source": "idle2.png",
+      "frameCount": 13,
+      "paths": [
+        "frames/idleReady/00.png",
+        "frames/idleReady/01.png",
+        "frames/idleReady/02.png",
+        "frames/idleReady/03.png",
+        "frames/idleReady/04.png",
+        "frames/idleReady/05.png",
+        "frames/idleReady/06.png",
+        "frames/idleReady/07.png",
+        "frames/idleReady/08.png",
+        "frames/idleReady/09.png",
+        "frames/idleReady/10.png",
+        "frames/idleReady/11.png",
+        "frames/idleReady/12.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "runRight": {
+      "source": "walkright.png",
+      "frameCount": 4,
+      "paths": [
+        "frames/runRight/00.png",
+        "frames/runRight/01.png",
+        "frames/runRight/02.png",
+        "frames/runRight/03.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "shocked": {
+      "source": "shocked.png",
+      "frameCount": 2,
+      "paths": [
+        "frames/shocked/00.png",
+        "frames/shocked/01.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.2
+      ]
+    },
+    "fallOver": {
+      "source": "fallOver.png",
+      "frameCount": 4,
+      "paths": [
+        "frames/fallOver/00.png",
+        "frames/fallOver/01.png",
+        "frames/fallOver/02.png",
+        "frames/fallOver/03.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "whirlwind": {
+      "source": "whirlwind.png",
+      "frameCount": 8,
+      "paths": [
+        "frames/whirlwind/00.png",
+        "frames/whirlwind/01.png",
+        "frames/whirlwind/02.png",
+        "frames/whirlwind/03.png",
+        "frames/whirlwind/04.png",
+        "frames/whirlwind/05.png",
+        "frames/whirlwind/06.png",
+        "frames/whirlwind/07.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "uppercut": {
+      "source": "uppercut.png",
+      "frameCount": 4,
+      "paths": [
+        "frames/uppercut/00.png",
+        "frames/uppercut/01.png",
+        "frames/uppercut/02.png",
+        "frames/uppercut/03.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "burned": {
+      "source": "burned.png",
+      "frameCount": 3,
+      "paths": [
+        "frames/burned/00.png",
+        "frames/burned/01.png",
+        "frames/burned/02.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.2
+      ]
+    },
+    "runLeft": {
+      "source": "walkright.png (mirrored)",
+      "frameCount": 4,
+      "paths": [
+        "frames/runLeft/00.png",
+        "frames/runLeft/01.png",
+        "frames/runLeft/02.png",
+        "frames/runLeft/03.png"
+      ],
+      "framesPerSecond": 10,
+      "frameDurations": [
+        0.1,
+        0.1,
+        0.1,
+        0.2
+      ]
+    }
+  }
+}
