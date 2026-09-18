@@ -244,7 +244,10 @@ def install_app_assets(manifest: dict) -> None:
         "clips": clips,
     }
     ASSETS.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(OUT / "frames", ASSETS / "frames", dirs_exist_ok=True)
+    frames_dir = ASSETS / "frames"
+    if frames_dir.exists():
+        shutil.rmtree(frames_dir)
+    shutil.copytree(OUT / "frames", frames_dir)
     (ASSETS / "pet.json").write_text(json.dumps(pack, indent=2) + "\n")
     provenance = {
         "source": "TMNT arcade-style strips in pets/; normalized to 192×208 with foot anchoring",
@@ -261,6 +264,8 @@ def main() -> int:
         print(f"Missing pets folder: {SOURCES}", file=sys.stderr)
         return 1
 
+    if OUT.joinpath("frames").exists():
+        shutil.rmtree(OUT / "frames")
     sheet_cache: dict[str, Image.Image] = {}
 
     def load_sheet(filename: str) -> Image.Image:
