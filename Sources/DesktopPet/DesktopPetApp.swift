@@ -16,7 +16,7 @@ struct DesktopPetApp: App {
                 ForEach(model.pets) { pet in Text(pet.manifest.name).tag(pet.id) }
             }
             Menu("Preview animation") {
-                ForEach(PetAnimation.allCases) { animation in
+                ForEach(model.currentPet.availableAnimations) { animation in
                     Button(animation.title) { model.previewAnimation(animation) }
                 }
             }

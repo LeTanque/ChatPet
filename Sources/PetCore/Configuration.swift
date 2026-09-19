@@ -85,8 +85,20 @@ public struct PetConfiguration: Codable, Equatable, Sendable {
     public var positionX: Double? = nil
     public var positionY: Double? = nil
     public init() {}
-    public func animation(for event: PetEvent) -> PetAnimation {
-        mappings[event.rawValue] ?? event.defaultAnimation
+    public func animation(for event: PetEvent, clipKeys: Set<String>? = nil) -> PetAnimation {
+        let candidate = mappings[event.rawValue] ?? event.defaultAnimation
+        guard let clipKeys else { return candidate }
+        if clipKeys.contains(candidate.rawValue) { return candidate }
+        if clipKeys.contains(event.defaultAnimation.rawValue) { return event.defaultAnimation }
+        if let fallback = PetAnimation.allCases.first(where: { clipKeys.contains($0.rawValue) }) {
+            return fallback
+        }
+        return .idle
+    }
+    public mutating func sanitizeMappings(for clipKeys: Set<String>) {
+        for (event, animation) in mappings where !clipKeys.contains(animation.rawValue) {
+            mappings.removeValue(forKey: event)
+        }
     }
     public mutating func normalize() {
         scale = scale.clamped(0.6...2, fallback: 1)

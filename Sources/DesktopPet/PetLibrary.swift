@@ -6,6 +6,10 @@ struct LoadedPet: Identifiable {
     var manifest: PetPack
     var images: [String: [NSImage]] = [:]
     var id: String { manifest.id }
+    var clipKeys: Set<String> { Set(manifest.clips.keys) }
+    var availableAnimations: [PetAnimation] {
+        PetAnimation.allCases.filter { manifest.clips[$0.rawValue] != nil }
+    }
 }
 
 @MainActor

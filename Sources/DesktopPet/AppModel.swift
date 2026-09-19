@@ -80,7 +80,12 @@ final class AppModel: ObservableObject {
     }
     func update(_ change: (inout PetConfiguration) -> Void) {
         let previous = configuration
-        var new = configuration; change(&new); new.normalize(); configuration = new
+        var new = configuration; change(&new)
+        if previous.selectedPet != new.selectedPet,
+           let pet = pets.first(where: { $0.id == new.selectedPet }) {
+            new.sanitizeMappings(for: pet.clipKeys)
+        }
+        new.normalize(); configuration = new
         petWindow?.apply(configuration)
         if previous.network != new.network || previous.networkEnabled != new.networkEnabled ||
             previous.paused != new.paused || previous.visible != new.visible ||
@@ -149,7 +154,7 @@ final class AppModel: ObservableObject {
     private func tick() {
         let event = router.currentEvent(at: now)
         if self.event != event { self.event = event; refreshSettingsIfVisible() }
-        var desired = configuration.animation(for: event)
+        var desired = configuration.animation(for: event, clipKeys: currentPet.clipKeys)
         if let override = preview {
             if override.1 > now { desired = override.0 } else { preview = nil }
         }
@@ -167,6 +172,9 @@ final class AppModel: ObservableObject {
     func reloadPets() {
         library.reload(); pets = library.pets
         if !library.warnings.isEmpty { message = library.warnings.joined(separator: "\n") }
+        var config = configuration
+        config.sanitizeMappings(for: currentPet.clipKeys)
+        if config.mappings != configuration.mappings { configuration = config; scheduleSave() }
     }
     func importPet() {
         NSApp.activate(ignoringOtherApps: true)

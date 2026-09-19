@@ -2,6 +2,16 @@ import Foundation
 import Testing
 @testable import PetCore
 
+@Test func animationMappingRespectsAvailableClips() {
+    var config = PetConfiguration()
+    let turtleClips: Set<String> = ["idle", "runLeft", "runRight", "failed", "laptop"]
+    config.mappings[PetEvent.stopped.rawValue] = .shocked
+    #expect(config.animation(for: .stopped, clipKeys: turtleClips) == .failed)
+    config.sanitizeMappings(for: turtleClips)
+    #expect(config.mappings[PetEvent.stopped.rawValue] == nil)
+    #expect(config.animation(for: .stopped, clipKeys: turtleClips) == .failed)
+}
+
 @Test func defaultsMatchRequestedBehavior() {
     let config = PetConfiguration()
     #expect(config.selectedPet == "builtin.blue-turtle")

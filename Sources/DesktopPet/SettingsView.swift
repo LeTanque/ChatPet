@@ -69,12 +69,20 @@ struct SettingsView: View {
             Section("When an event happens") {
                 ForEach(PetEvent.allCases) { event in
                     HStack {
-                        Picker(event.title, selection: Binding(get: { model.configuration.animation(for: event) }, set: { value in
+                        Picker(event.title, selection: Binding(get: {
+                            model.configuration.animation(for: event, clipKeys: model.currentPet.clipKeys)
+                        }, set: { value in
                             model.update { $0.mappings[event.rawValue] = value }
                         })) {
-                            ForEach(PetAnimation.allCases) { animation in Text(animation.title).tag(animation) }
+                            ForEach(model.currentPet.availableAnimations) { animation in
+                                Text(animation.title).tag(animation)
+                            }
                         }
-                        Button { model.previewAnimation(model.configuration.animation(for: event)) } label: {
+                        Button {
+                            model.previewAnimation(
+                                model.configuration.animation(for: event, clipKeys: model.currentPet.clipKeys)
+                            )
+                        } label: {
                             Image(systemName: "play.fill")
                         }.help("Preview for six seconds").accessibilityLabel("Preview \(event.title)")
                     }
