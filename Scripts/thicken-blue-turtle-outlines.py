@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Expand Blue Turtle black outlines outward by one pixel into transparent areas."""
+"""Expand Blue Turtle black outlines outward into transparent areas (one pixel per pass)."""
 from __future__ import annotations
 
 import hashlib
@@ -10,7 +10,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "Sources/DesktopPet/Assets/BlueTurtle"
-PASSES = 1
+PASSES = 2
 NEIGHBORS = (
     (-1, 0),
     (1, 0),
@@ -64,9 +64,10 @@ def main() -> None:
 
     provenance_path = PACK / "provenance.json"
     provenance = json.loads(provenance_path.read_text())
+    pass_word = "pass" if PASSES == 1 else "passes"
     provenance["copyMethod"] = (
-        "PNG frames with 12-color palette; black outlines expanded one pixel outward "
-        f"({PASSES} pass) via Scripts/thicken-blue-turtle-outlines.py"
+        "PNG frames with 12-color palette; black outlines expanded one pixel outward per pass "
+        f"({PASSES} {pass_word}) via Scripts/thicken-blue-turtle-outlines.py"
     )
     provenance["frameSHA256"] = {
         str(path.relative_to(PACK)): sha256_file(path) for path in paths

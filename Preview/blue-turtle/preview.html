@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Blue Turtle — animation preview</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { margin: 24px; background: #1a1a1a; color: #eee; }
+    h1 { font-size: 1.25rem; font-weight: 600; }
+    p { color: #aaa; max-width: 56rem; line-height: 1.5; }
+    .stage {
+      margin: 20px 0;
+      padding: 24px;
+      background:
+        repeating-conic-gradient(#333 0% 25%, #2a2a2a 0% 50%) 50% / 24px 24px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+    canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      width: 384px;
+      height: 416px;
+    }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; align-items: center; }
+    button, select {
+      font: inherit;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #2d2d2d;
+      color: #eee;
+      cursor: pointer;
+    }
+    button:hover, select:hover { border-color: #666; }
+    label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #bbb; }
+    .meta { font-size: 0.9rem; color: #888; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+      max-width: 56rem;
+    }
+    .thumb {
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .thumb:hover { border-color: #666; }
+    .thumb img {
+      width: 100%;
+      image-rendering: pixelated;
+      background:
+        repeating-conic-gradient(#333 0% 25%, #2a2a2a 0% 50%) 50% / 12px 12px;
+    }
+    .thumb span { display: block; font-size: 0.75rem; color: #999; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Blue Turtle (preview)</h1>
+  <p>
+    Frames and timing from <code>Sources/DesktopPet/Assets/BlueTurtle/pet.json</code>
+    (thicker black outlines). Regenerate with
+    <code>python3 Scripts/build-blue-turtle-preview.py</code> after asset changes.
+  </p>
+  <div class="controls">
+    <select id="clip"></select>
+    <button type="button" id="play">Pause</button>
+    <button type="button" id="step">Next frame</button>
+    <label><input type="checkbox" id="baseline" checked /> Show foot baseline</label>
+  </div>
+  <div class="stage">
+    <canvas id="c" width="192" height="208"></canvas>
+  </div>
+  <p class="meta" id="status"></p>
+  <div class="grid" id="thumbs"></div>
+  <script src="preview-data.js"></script>
+  <script>
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+    const clipSelect = document.getElementById("clip");
+    const status = document.getElementById("status");
+    const baseline = document.getElementById("baseline");
+    let manifest = { clips: {} };
+    let playing = true;
+    let frameIndex = 0;
+    let elapsed = 0;
+    let last = performance.now();
+    const images = {};
+
+    function drawBaseline() {
+      if (!baseline.checked) return;
+      const y = canvas.height - (manifest.footPadding ?? 9);
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 80, 80, 0.55)";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, y + 0.5);
+      ctx.lineTo(canvas.width, y + 0.5);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function draw() {
+      const id = clipSelect.value;
+      const clip = manifest.clips[id];
+      const imgs = images[id];
+      const img = imgs[frameIndex % imgs.length];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (img.complete && img.naturalWidth) {
+        ctx.drawImage(img, 0, 0);
+      }
+      drawBaseline();
+      status.textContent =
+        `${clip.label || id} — frame ${(frameIndex % imgs.length) + 1} / ${imgs.length}`;
+    }
+
+    function tick(now) {
+      if (playing) {
+        const dt = (now - last) / 1000;
+        last = now;
+        elapsed += dt;
+        const clip = manifest.clips[clipSelect.value];
+        const durations = clip.frameDurations;
+        const total = durations.reduce((a, b) => a + b, 0);
+        let pos = elapsed % total;
+        let idx = 0;
+        for (let i = 0; i < durations.length; i++) {
+          if (pos < durations[i]) { idx = i; break; }
+          pos -= durations[i];
+        }
+        if (idx !== frameIndex) {
+          frameIndex = idx;
+          draw();
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function buildUI() {
+      clipSelect.innerHTML = "";
+      for (const id of Object.keys(manifest.clips)) {
+        const clip = manifest.clips[id];
+        const opt = document.createElement("option");
+        opt.value = id;
+        opt.textContent = clip.label || id;
+        clipSelect.appendChild(opt);
+        images[id] = clip.paths.map((path) => {
+          const img = new Image();
+          img.src = path;
+          return img;
+        });
+      }
+      const thumbs = document.getElementById("thumbs");
+      thumbs.innerHTML = "";
+      for (const id of Object.keys(manifest.clips)) {
+        const clip = manifest.clips[id];
+        const div = document.createElement("div");
+        div.className = "thumb";
+        div.title = "Play " + (clip.label || id);
+        const img = document.createElement("img");
+        img.src = clip.paths[0];
+        img.alt = id;
+        const cap = document.createElement("span");
+        cap.textContent = `${clip.label || id} (${clip.frameCount})`;
+        div.appendChild(img);
+        div.appendChild(cap);
+        div.addEventListener("click", () => {
+          clipSelect.value = id;
+          frameIndex = 0;
+          elapsed = 0;
+          last = performance.now();
+          draw();
+        });
+        thumbs.appendChild(div);
+      }
+    }
+
+    clipSelect.addEventListener("change", () => {
+      frameIndex = 0;
+      elapsed = 0;
+      last = performance.now();
+      draw();
+    });
+
+    document.getElementById("play").addEventListener("click", (e) => {
+      playing = !playing;
+      e.target.textContent = playing ? "Pause" : "Play";
+      last = performance.now();
+    });
+
+    document.getElementById("step").addEventListener("click", () => {
+      const clip = manifest.clips[clipSelect.value];
+      frameIndex = (frameIndex + 1) % clip.paths.length;
+      draw();
+    });
+
+    baseline.addEventListener("change", draw);
+
+    manifest = window.__PREVIEW_MANIFEST__;
+    if (!manifest || !manifest.clips) {
+      status.textContent = "Missing preview-data.js — run Scripts/build-blue-turtle-preview.py";
+    } else {
+      buildUI();
+      Promise.all(
+        Object.values(images).flat().map(
+          (img) => new Promise((res) => { img.onload = res; img.onerror = res; })
+        )
+      ).then(() => {
+        draw();
+        requestAnimationFrame(tick);
+      });
+    }
+  </script>
+</body>
+</html>
